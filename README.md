@@ -176,11 +176,13 @@ After installation, a great test would be to reconstruct the well-known [Stanfor
 
 Note: the commands should follow right after the installation. (Make sure you are at the correct working directory)
 ```
+cd ..
+
 // For Windows
-./Release/RsR.exe ../configs/example_config.txt
+./build/Release/RsR.exe ./configs/example_config.txt
 
 // For Linux and Mac
-./RSR ../configs/example_config.txt
+./build/RSR ./configs/example_config.txt
 ```
 
 A reconstructed bunny should be found in the **output** folder.
