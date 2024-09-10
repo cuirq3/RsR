@@ -1,7 +1,6 @@
-root ./example
+root ../example
 model_name bun_complete.obj
-out_root ./output
-//out_root C:/Projects_output/Stanford_Recon
+out_root ../output
 out_name bunny_example
 isEuclidean false
 isGTNormal false

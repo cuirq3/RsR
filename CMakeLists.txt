@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 20)
 
 # set the project name
-project(Vanilla)
+project(RsR)
 
 find_package(Boost COMPONENTS filesystem graph REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
@@ -24,7 +24,7 @@ file(GLOB SOURCES "${SOURCE_DIR}/*.cpp" "${SOURCE_DIR}/*.h")
 set(ENTRY_POINT "${SOURCE_DIR}/Recon.cpp")
 
 # add the executable
-add_executable(Vanilla ${ENTRY_POINT} ${SOURCES})
+add_executable(RsR ${ENTRY_POINT} ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} Boost::filesystem)
 target_link_libraries(${PROJECT_NAME} CGAL::CGAL)

@@ -1,6 +1,10 @@
 <div align="center">
 
-# Surface Reconstruction Using Rotation Systems
+# RsR: Rotation-System Reconstruction
+
+This is the official implementation of
+
+## Surface Reconstruction Using Rotation Systems
 
 <font size="4">
 <a href="https://cuirq3.github.io/" style="font-size:100%;">Ruiqi Cui<sup>1</sup></a>&emsp;
@@ -49,60 +53,134 @@ control over the topology of the reconstructed surface._
   <li><b>Improvement:</b> Remove the reliance on 3rd party libraries.</li>
 </ul>
 </details>
+<br>
 
 # Getting Started
 We tested our project on [Windows](#Windows), [Linux](#linux), and [Mac](#mac) OS. You can find the corresponding installation guide below.
 
-## Windows
-We recommend using [VCPKG](https://github.com/microsoft/vcpkg?tab=readme-ov-file) + [CMake](https://cmake.org/) for installation. A good tutorial can be found [here](https://learn.microsoft.com/vcpkg/get_started/get-started). We specify the software and library versions used in our tests, but users are not limited to these versions.
+<details>
+
+<summary><strong style="font-size: 1.5em;">&nbsp;Windows</strong></summary>
+
+We recommend using <a href="https://github.com/microsoft/vcpkg?tab=readme-ov-file">VCPKG</a> + <a href="https://cmake.org/">CMake</a> for installation. A good tutorial can be found <a href="https://learn.microsoft.com/vcpkg/get_started/get-started">here</a>. We specify the software and library versions used in our tests, but users are not limited to these versions.
 
 ### 0. Prerequisites
+
 All the libs are installed via VCPKG.
 
 - CMake 3.29.0-rc2
 - Visual Studio 2019
 - VCPKG 
 - Libs
-  - CGAL 5.6
-  - Boost
-  - Eigen3 3.4.0
+  - [CGAL](https://www.cgal.org/download/windows.html) 5.6
+  - [Boost](https://www.boost.org/doc/libs/1_86_0/more/getting_started/windows.html)
+  - [Eigen3](https://eigen.tuxfamily.org/index.php?title=Main_Page) 3.4.0
 
 ### 1. Installing
 
 - Clone the repo.
 ```
-git clone https://github.com/cuirq3/Graphics_Lab_Spring_2022.git
-cd Graphics_Lab_Spring_2022/Vanilla
+git clone https://github.com/cuirq3/RsR.git
+cd RsR
 ```
 
-- Modify the CMakePresets.json as the comments described. (Comments are written after the "//" key)
-
-- Configure and Generate
+- Configure and Generate - replace `path/to/vcpkg` with your local setting, e.g. `C:/vcpkg`
 ```
-cmake --preset=default
+mkdir build
+cd build
+cmake -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release ..
 ```
 - Build - Manually do it in the IDE or run the following command
 ```
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --config Release
+cmake --build . --config Release
 ```
 - Done! You can jump to [A simple example](#a-simple-example) to test if it is successfully installed.
+</details>
 
-## Linux
 
-## Mac
+<details>
+
+<summary><strong style="font-size: 1.5em;">&nbsp;Linux (Ubuntu)</strong></summary>
+
+### 0. Prerequisites
+
+Install required software and packages:
+
+```
+sudo apt install cmake
+sudo apt install libcgal-dev
+sudo apt install libboost-all-dev
+sudo apt install libeigen3-dev
+```
+
+### 1. Installing
+
+- Clone the repo.
+```
+git clone https://github.com/cuirq3/RsR.git
+cd RsR
+```
+
+- Compile
+```
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j 12
+```
+
+- Done! You can go to [A simple example](#a-simple-example) to test if it is successfully installed.
+
+</details>
+
+<details>
+
+<summary><strong style="font-size: 1.5em;">&nbsp;Mac</strong></summary>
+
+We tested with <a href="https://www.macports.org">MacPorts</a> + <a href="https://cmake.org/">CMake</a> for installation. We specify the software and library versions used in our tests, but users are not limited to these versions.
+
+### 0. Prerequisites
+
+Install required software and packages:
+
+```
+sudo port install cmake
+sudo port install cgal5
+sudo port install boost
+sudo port install eigen3
+```
+
+### 1. Installing
+
+- Clone the repo.
+```
+git clone https://github.com/cuirq3/RsR.git
+cd RsR
+```
+
+- Compile
+```
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j 12
+```
+
+- Done! You can go to [A simple example](#a-simple-example) to test if it is successfully installed.
+
+</details>
+<br>
 
 # A simple example
 After installation, a great test would be to reconstruct the well-known [Stanford Bunny](https://graphics.stanford.edu/data/3Dscanrep/). The point cloud is already included in the example folder. You can directly start reconstructing by running the following command.
+
+Note: the commands should follow right after the installation. (Make sure you are at the correct working directory)
 ```
 // For Windows
-./build/src/Release/Vanilla.exe ./configs/example_config.txt
+./Release/RsR.exe ../configs/example_config.txt
 
-// For Linux
-
-
-// For Mac
-
+// For Linux and Mac
+./RSR ../configs/example_config.txt
 ```
 
 A reconstructed bunny should be found in the **output** folder.
