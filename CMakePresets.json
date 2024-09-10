@@ -1,0 +1,17 @@
+{
+    "version": 3,
+    "configurePresets": [
+      {
+        "name": "default",
+
+        "//": "Change to your own generator. E.g. Ninja, Visual Studio ...",
+        "generator": "Visual Studio 16 2019",
+        
+        "binaryDir": "${sourceDir}/build",
+        "cacheVariables": {
+          "//": "Path to the vckpkg chain file, replace $env{VCPKG_ROOT} with your local path.",
+          "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        }
+      }
+    ]
+  }
