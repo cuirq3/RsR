@@ -56,7 +56,7 @@ control over the topology of the reconstructed surface._
 <br>
 
 # Getting Started
-We tested our project on [Windows](#Windows), [Linux](#linux), and [Mac](#mac) OS. You can find the corresponding installation guide below.
+We tested our project on Windows, Linux, and Mac OS. You can find the corresponding installation guide below.
 
 <details>
 
