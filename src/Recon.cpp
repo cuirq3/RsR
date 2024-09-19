@@ -514,8 +514,8 @@ void Reconstructor::reconstruct_single(m_Model& ReconModel, m_Model& GTModel,
             // Edge connection
             for (int i = 0; i < edge_length.size(); i++) {
                 if (i % 100000 == 0) {
-                    std::cout << "Step " << i << " / " <<
-                        edge_length.size() << std::endl;
+                    //std::cout << "Step " << i << " / " << edge_length.size() << std::endl;
+                    showProgressBar(i / float(edge_length.size()));
                 }
                 unsigned int edge_idx = edge_length[i].second;
                 m_Edge this_edge = full_edges[edge_idx];
@@ -540,6 +540,8 @@ void Reconstructor::reconstruct_single(m_Model& ReconModel, m_Model& GTModel,
                         betti_1.push_back(bettiNum_1);
                 }
             }
+            showProgressBar(1.0);
+            std::cout << std::endl;
 
             // Output
             if (exp_genus != 0 && isDebug) {
@@ -734,6 +736,20 @@ void Reconstructor::traverse_and_reconstruct(const fs::path& dirPath, int k)
     }
     time_file.close();
     return;
+}
+
+void Reconstructor::showProgressBar(float progress) {
+    int barWidth = 70;  // Width of the progress bar
+
+    std::cout << "[";
+    int pos = barWidth * progress;
+    for (int i = 0; i < barWidth; ++i) {
+        if (i < pos) std::cout << "=";
+        else if (i == pos) std::cout << ">";
+        else std::cout << " ";
+    }
+    std::cout << "] " << int(progress * 100.0) << " %\r";  // \r returns to the beginning of the line
+    std::cout.flush();  // Flush the output to show the progress
 }
 
 int main(int argc, char* argv[]){

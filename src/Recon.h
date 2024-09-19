@@ -8,6 +8,7 @@
 #include <CGAL/mst_orient_normals.h>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 #include <boost/iterator/zip_iterator.hpp>
+#include <chrono>
 
 #include "io.h"
 #include "math_util.h"
@@ -92,6 +93,8 @@ public:
 
 	void noise_experiment();
 
+	void showProgressBar(float progress);
+
 	Timer recon_timer;
 
 private:
@@ -129,4 +132,3 @@ private:
 	}
 
 };
-

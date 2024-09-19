@@ -88,6 +88,7 @@ cd RsR
 ```
 mkdir build
 cd build
+// You can choose compiler with specifying -G argument after cmake command.
 cmake -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release ..
 ```
 - Build - Manually do it in the IDE or run the following command
@@ -175,9 +176,13 @@ make -j 12
 After installation, a great test would be to reconstruct the well-known [Stanford Bunny](https://graphics.stanford.edu/data/3Dscanrep/). The point cloud is already included in the example folder. You can directly start reconstructing by running the following command.
 
 Note: the commands should follow right after the installation. (Make sure you are at the correct working directory)
+
+Go to the root folder.
 ```
 cd ..
-
+```
+... and reconstruct!
+```
 // For Windows
 ./build/Release/RsR.exe ./configs/example_config.txt
 
