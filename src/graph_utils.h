@@ -26,8 +26,6 @@ typedef Kernel::Point_3 Point;
 typedef Kernel::Vector_3 Vector;
 typedef boost::tuple<Point, Vector> PointWithNormal;
 
-enum Dist_mode { regular, irregular };
-
 struct VertexProperty {
 	int id = -1;
 	int normal_rep = -1;
@@ -67,7 +65,6 @@ struct EdgeProperty {
 	bool hole_visited = false;
 };
 
-
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, VertexProperty, EdgeProperty> Graph;
 typedef boost::adjacency_list< boost::vecS, boost::vecS, boost::undirectedS,
 	boost::property< boost::vertex_distance_t, float >, boost::property< boost::edge_weight_t, float > >
@@ -78,7 +75,6 @@ typedef Graph::vertex_iterator vertex_iter;
 typedef Graph::edge_iterator edge_iter;
 typedef Graph::edge_descriptor Edge;
 typedef VertexProperty::Neighbor Neighbor;
-
 
 class Face {
 public:
@@ -201,53 +197,27 @@ typedef CGAL::Parallel_if_available_tag Concurrency_tag;
 void kNN_search(int, const Point&, const Tree&, const Distance&, int,
 	std::vector<int>&, std::vector<float>&, bool isContain = true);
 
-void kNN_search(int, const Point&, const Tree&, const Distance&, float,
+void NN_search(int, const Point&, const Tree&, const Distance&, float,
 	std::vector<int>&, std::vector<float>&, bool isContain = true);
 
 float find_components(std::vector<Point>&,
 	std::vector<std::vector<Point>>&, std::vector<Point>&,
 	std::vector<std::vector<Point>>&, std::vector<Vector>&,
 	std::vector<std::vector<Vector>>&, const Tree&, const Distance&,
-	int, bool, bool);
-
-void build_dist_angle_matrix(const std::vector<Point>&,
-	const std::vector<Vector>&, const Tree&, 
-	const Distance&, int, std::vector<std::vector<float>>&,
-	std::vector<std::vector<int>>&, std::vector<std::vector<float>>&,
-	bool, bool);
+	int, bool, float, float);
 
 void init_graph(const std::vector<Point>& vertices, const std::vector<Point>& smoothed_v,
                 const std::vector<Vector>& normals, const Tree& kdTree, const Distance& tr_dist,
-                int k, s_Graph& dist_graph, s_weightMap& weightmap,
-                bool isGTNormal, bool isEuclidean, std::vector<float>& max_length
-	, int exp_genus, std::vector<float>& pre_max_length);
-
-void unordered_set_intersection(std::unordered_set<Vertex>&,
-	std::unordered_set<Vertex>&, std::vector<Vertex>&);
-
-void unordered_set_intersection(std::unordered_set<int>&,
-	std::unordered_set<int>&, std::vector<int>&);
-
-void unordered_set_intersection(std::unordered_set<int>&,
-	std::unordered_set<int>&,
-	std::unordered_set<int>&);
+                int k, s_Graph& dist_graph, s_weightMap& weightmap, bool isEuclidean, std::vector<float>& max_length,
+				int exp_genus, std::vector<float>& pre_max_length, float cross_conn_thresh);
 
 void print_path(std::vector<Vertex>&, Vertex, std::vector<Vertex>&);
 
 int find_shortest_path(const m_Graph&, Vertex, Vertex, int, std::vector<Vertex>&);
 
-void build_dist_map(const m_Graph&,
-	std::vector<int>&, Vertex, int);
-
-Vertex travel_ccw(m_Graph&,
-	Vertex, Vertex);
-
-Vertex travel_cw(m_Graph&,
-	Vertex, Vertex);
-
-float cal_proj_dist(const Vector& edge,
-	Vector& this_normal, Vector& neighbor_normal);
-// Deprecated
-//bool find_shortest_path_index(const m_Graph&, Vertex, Vertex, int, bool);
+void weighted_smooth(const std::vector<Point>& vertices,
+	std::vector<Point>& smoothed_v, const std::vector<Vector>& normals,
+	const Tree& kdTree, const Distance& tr_dist,
+	float diagonal_length);
 
 #endif

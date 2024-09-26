@@ -39,7 +39,7 @@ void add_face(m_Graph&, std::vector<Vertex>&,
 void triangulate(std::vector<Face>&, m_Graph&,
 	const Tree&, const Distance&, bool,
 	bool isEuclidean, std::vector<float>& length_thresh,
-	std::vector<Vertex>& connected_handle_root, std::vector<int>& betti, bool isFinalize=false);
+	std::vector<Vertex>& connected_handle_root, std::vector<int>& betti, bool isFinalize = false);
 
 bool routine_check(m_Graph& mst, std::vector<Vertex>& triangle);
 

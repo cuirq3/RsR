@@ -1,6 +1,20 @@
 #include "graph_utils.h"
 #include "RS.h"
 
+/**
+ * @brief k nearest neighbor search
+ *
+ * @param query_id: the index of the point to be queried
+ * @param query: the coordinate of the point to be queried
+ * @param kdTree: kd-tree for knn query
+ * @param tr_dist: distance container
+ * @param k: number of nearest neighbors to be queried
+ * @param neighbors: [OUT] indices of k nearest neighbors
+ * @param neighbor_distance: [OUT] corresponding distance to the query point
+ * @param isContain: does the query point itself count as a neighbor
+ *
+ * @return None
+ */
 void kNN_search(int query_id, const Point& query, const Tree& kdTree,
 	const Distance& tr_dist, int k, std::vector<int>& neighbors,
 	std::vector<float>& neighbor_distance, bool isContain) {
@@ -16,7 +30,21 @@ void kNN_search(int query_id, const Point& query, const Tree& kdTree,
 	return;
 }
 
-void kNN_search(int query_id, const Point& query, const Tree& kdTree,
+/**
+ * @brief neighbor search within a specific radius
+ *
+ * @param query_id: the index of the point to be queried
+ * @param query: the coordinate of the point to be queried
+ * @param kdTree: kd-tree for knn query
+ * @param tr_dist: distance container
+ * @param radius: the radius of the search ball
+ * @param neighbors: [OUT] indices of k nearest neighbors
+ * @param neighbor_distance: [OUT] corresponding distance to the query point
+ * @param isContain: does the query point itself count as a neighbor
+ *
+ * @return None
+ */
+void NN_search(int query_id, const Point& query, const Tree& kdTree,
 	const Distance& tr_dist, float radius, std::vector<int>& neighbors,
 	std::vector<float>& neighbor_distance, bool isContain) {
 
@@ -34,6 +62,25 @@ void kNN_search(int query_id, const Point& query, const Tree& kdTree,
 	return;
 }
 
+/**
+ * @brief Find the number of connected components and separate them
+ *
+ * @param vertices: vertices of the point cloud
+ * @param component_vertices: [OUT] point cloud vertices in different connected components
+ * @param smoothed_v: smoothed vertices of the point cloud
+ * @param component_smoothed_v: [OUT] smoothed point cloud vertices in different connected components
+ * @param normals: normal of the point cloud vertices
+ * @param component_normals: [OUT] normal of the point cloud vertices in different components
+ * @param kdTree: kd-tree for neighbor query
+ * @param tr_dist: distance container
+ * @param k: number of nearest neighbors to be queried
+ * @param isEuclidean: if Euclidean distance is used as edge weight
+ * @param cross_conn_thresh: angle threshold to avoid connecting vertices on different surface
+ * @param outlier_thresh: threshold to remove outlier
+ * 
+ *
+ * @return None
+ */
 float find_components(std::vector<Point>& vertices,
 	std::vector<std::vector<Point>>& component_vertices,
 	std::vector<Point>& smoothed_v,
@@ -41,7 +88,7 @@ float find_components(std::vector<Point>& vertices,
 	std::vector<Vector>& normals,
 	std::vector<std::vector<Vector>>& component_normals,
 	const Tree& kdTree, const Distance& tr_dist,
-	int k, bool isGTNormal, bool isEuclidean) {
+	int k, bool isEuclidean, float cross_conn_thresh, float outlier_thresh) {
 	float avg_edge_length = 0;
 	Graph components(smoothed_v.size());
 	int this_idx = 0;
@@ -67,7 +114,7 @@ float find_components(std::vector<Point>& vertices,
 				float cos_theta = this_normal * neighbor_normal /
 					std::sqrt(this_normal.squared_length()) /
 					std::sqrt(neighbor_normal.squared_length());
-				float cos_thresh = std::cos(60. / 180. * CGAL_PI);
+				float cos_thresh = std::cos(cross_conn_thresh / 180. * CGAL_PI);
 				if (isEuclidean)
 					cos_thresh = 0.;
 				if (cos_theta >= cos_thresh) {
@@ -111,7 +158,7 @@ float find_components(std::vector<Point>& vertices,
 		this_idx++;
 	}
 	std::cout << std::to_string(dup_remove.size()) << " duplicate vertices will be removed." << std::endl;
-	float thresh_r = avg_edge_length / boost::num_edges(components) * 20;
+	float thresh_r = avg_edge_length / boost::num_edges(components) * outlier_thresh;
 
 	// Remove Edge Longer than threshold
 	auto es = boost::edges(components);
@@ -184,117 +231,30 @@ float find_components(std::vector<Point>& vertices,
 	return thresh_r;
 }
 
-void build_dist_angle_matrix(const std::vector<Point>& vertices, 
-	const std::vector<Vector>& normals, const Tree& kdTree, const Distance& tr_dist,
-	int k, std::vector<std::vector<float>>& dist_matrix,
-	std::vector<std::vector<int>>& id_matrix,
-	std::vector<std::vector<float>>& angle_matrix,
-	bool isGTNormal, bool isEuclidean) {
-	int i = 0;
-	for (auto vertex : vertices) {
-		Vector this_normal = normals[i];
-
-		//K_neighbor_search search(kdTree, query, k + 1, 0, true, tr_dist);
-		std::vector<int> neighbors;
-		std::vector<float> dists;
-		kNN_search(i, vertex, kdTree, tr_dist, k, neighbors, dists);
-
-		// Filter out cross connection
-		if (isGTNormal) {
-			std::vector<int> temp;
-			for (int j = 0; j < neighbors.size(); j++) {
-				int idx = neighbors[j];
-				Vector neighbor_normal = normals[idx];
-				float cos_theta = this_normal * neighbor_normal /
-					std::sqrt(this_normal.squared_length()) /
-					std::sqrt(neighbor_normal.squared_length());
-				float cos_thresh = std::cos(120. / 180. * CGAL_PI);
-				if (cos_theta >= cos_thresh) {
-					temp.push_back(idx);
-				}
-			}
-			if (temp.size() == 0)
-				std::cout << "Bad normal input" << std::endl;
-			else {
-				neighbors.clear();
-				neighbors = temp;
-			}
-		}
-
-		std::vector<float> dist_vector;
-		std::vector<int> id_vector;
-		std::vector<float> angle_vector;
-		for (int j = 0; j < neighbors.size(); j++) {
-			int idx = neighbors[j];
-			Vector neighbor_normal = normals[idx];
-			Point neighbor_pos = vertices[idx];
-			Vector edge = neighbor_pos - vertex;
-			float Euclidean_dist = norm(edge);
-			if (isEuclidean)
-				dist_vector.push_back(Euclidean_dist);
-			else {
-				float neighbor_normal_length = edge * normalize_vector(neighbor_normal);
-				float normal_length = edge * normalize_vector(this_normal);
-				float projection_dist = sqrtf((Euclidean_dist * Euclidean_dist) - (normal_length * normal_length));
-				projection_dist += sqrtf((Euclidean_dist * Euclidean_dist) -
-					(neighbor_normal_length * neighbor_normal_length));
-				projection_dist /= 2.;
-				if (std::abs(normalize_vector(this_normal) * normalize_vector(neighbor_normal)) < 0.71)
-					projection_dist = Euclidean_dist;
-				dist_vector.push_back(projection_dist);
-			}
-
-			float angle_weight = cal_angle_based_weight(normalize_vector(this_normal),
-				normalize_vector(neighbor_normal));
-			if (angle_weight < 0)
-				std::cout << "error" << std::endl;
-			angle_vector.push_back(angle_weight);
-			id_vector.push_back(idx);
-		}
-		dist_matrix.push_back(dist_vector);
-		id_matrix.push_back(id_vector);
-		angle_matrix.push_back(angle_vector);
-		/*if (i == 253059) {
-			Vector edge1 = vertices[60179] - vertex;
-			float Eucli_dist1 = norm(edge1);
-			std::cout << Eucli_dist1 << std::endl;
-			float neighbor_normal_length = edge1 * normalize_vector(normals[60179]);
-			std::cout << neighbor_normal_length << std::endl;
-			float normal_length = edge1 * normalize_vector(this_normal);
-			std::cout << normal_length << std::endl;
-			float projection_dist = std::sqrtf((Eucli_dist1 * Eucli_dist1) - (normal_length * normal_length));
-			projection_dist += std::sqrtf((Eucli_dist1 * Eucli_dist1) -
-				(neighbor_normal_length * neighbor_normal_length));
-			projection_dist /= 2.;
-			std::cout << projection_dist << std::endl;
-			if (normalize_vector(this_normal) * normalize_vector(normals[60179]) < 0.71)
-				projection_dist = Eucli_dist1;
-
-			Vector edge2 = vertices[253060] - vertex;
-			float Eucli_dist2 = norm(edge2);
-			std::cout << Eucli_dist2 << std::endl;
-			neighbor_normal_length = edge2 * normalize_vector(normals[253060]);
-			std::cout << neighbor_normal_length << std::endl;
-			normal_length = edge2 * normalize_vector(this_normal);
-			std::cout << normal_length << std::endl;
-			projection_dist = std::sqrtf((Eucli_dist2 * Eucli_dist2) - (normal_length * normal_length));
-			projection_dist += std::sqrtf((Eucli_dist2 * Eucli_dist2) -
-				(neighbor_normal_length * neighbor_normal_length));
-			projection_dist /= 2.;
-			std::cout << projection_dist << std::endl;
-			if (normalize_vector(this_normal) * normalize_vector(normals[253060]) < 0.71)
-				projection_dist = Eucli_dist2;
-		}*/
-		i++;
-	}
-	return;
-}
-
+/**
+ * @brief initialize the graph and related information
+ *
+ * @param vertices: vertices of the componnet
+ * @param smoothed_v: smoothed vertices of the component
+ * @param normals: normal of the component vertices
+ * @param kdTree: kd-tree for neighbor query
+ * @param tr_dist: distance container
+ * @param k: number of nearest neighbors to be queried
+ * @param dist_graph: [OUT] a light-weight graph with essential connection for building MST
+ * @param weightmap: [OUT] edge weight of dist_graph
+ * @param isEuclidean: if it is using Euclidean distance
+ * @param max_length: [OUT] the distance of the longest connection each vertex involved
+ * @param exp_genus: user-specified expected genus number
+ * @param pre_max_length: [OUT] the maximum length of connection before connecting handles (conservative connection)
+ * @param cross_conn_thresh: angle threshold to avoid connecting vertices on different surface
+ *
+ *
+ * @return None
+ */
 void init_graph(const std::vector<Point>& vertices, const std::vector<Point>& smoothed_v,
 	const std::vector<Vector>& normals, const Tree& kdTree, const Distance& tr_dist,
-	int k, s_Graph& dist_graph, s_weightMap& weightmap,
-	bool isGTNormal, bool isEuclidean, std::vector<float>& max_length,
-	int exp_genus, std::vector<float>& pre_max_length) {
+	int k, s_Graph& dist_graph, s_weightMap& weightmap, bool isEuclidean, std::vector<float>& max_length,
+	int exp_genus, std::vector<float>& pre_max_length, float cross_conn_thresh) {
 	dist_graph = s_Graph(vertices.size());
 	int this_k = k;
 	if (exp_genus != 0) {
@@ -367,33 +327,15 @@ void init_graph(const std::vector<Point>& vertices, const std::vector<Point>& sm
 	return;
 }
 
-void unordered_set_intersection(std::unordered_set<Vertex>& first,
-	std::unordered_set<Vertex>& second,
-	std::vector<Vertex>& intersection) {
-	for (auto i = first.begin(); i != first.end(); i++) {
-		if (second.find(*i) != second.end()) 
-			intersection.push_back(*i);
-	}
-}
-
-void unordered_set_intersection(std::unordered_set<int>& first,
-	std::unordered_set<int>& second,
-	std::vector<int>& intersection) {
-	for (auto i = first.begin(); i != first.end(); i++) {
-		if (second.find(*i) != second.end())
-			intersection.push_back(*i);
-	}
-}
-
-void unordered_set_intersection(std::unordered_set<int>& first,
-	std::unordered_set<int>& second,
-	std::unordered_set<int>& intersection) {
-	for (auto i = first.begin(); i != first.end(); i++) {
-		if (second.find(*i) != second.end())
-			intersection.insert(*i);
-	}
-}
-
+/**
+ * @brief Retreive the shortest path in the graph
+ *
+ * @param pred: information map
+ * @param target: target vertex
+ * @param path: [OUT] vertex indices of the shortest path
+ *
+ * @return None
+ */
 void print_path(std::vector<Vertex>& pred, Vertex target, std::vector<Vertex>& path) {
 	if (pred[target] == target) {
 		path.push_back(target);
@@ -403,7 +345,17 @@ void print_path(std::vector<Vertex>& pred, Vertex target, std::vector<Vertex>& p
 	path.push_back(target);
 }
 
-
+/**
+ * @brief Find the shortest path from one vertex to another in the graph
+ *
+ * @param mst: the graph
+ * @param this_v: the source vertex
+ * @param neighbor: the target vertex
+ * @param threshold: the step threshold, if longer than this threshold, the algorithm early stop
+ * @param path: stores the indices of vertex in the shortest path (for visualization)
+ *
+ * @return the number of steps of the shortest path
+ */
 int find_shortest_path(const m_Graph& mst, Vertex this_v, Vertex neighbor, int threshold, std::vector<Vertex>& path) {
 	// Init
 	int shortest_path_step = -1;
@@ -431,79 +383,75 @@ int find_shortest_path(const m_Graph& mst, Vertex this_v, Vertex neighbor, int t
 	return shortest_path_step;
 }
 
-void build_dist_map(const m_Graph& mst, std::vector<int>& dist, Vertex this_v, int threshold) {
-	// Init
-	my_visitor vis{ 0, threshold, dist.data() };
-	auto distmap = dist.data();
+/**
+ * @brief weighted smoothing method using defined neighborhood with tangential distance weighted
+ *
+ * @param vertices: vertices of the point cloud
+ * @param smoothed_v: [OUT] vertices after smoothing
+ * @param normals: normal of the point cloud
+ * @param kdTree: kd-tree for knn query
+ * @param tr_dist: distance container
+ * @param diagonal_length: the diagonal length of the point cloud
+ *
+ * @return None
+ */
+void weighted_smooth(const std::vector<Point>& vertices,
+	std::vector<Point>& smoothed_v, const std::vector<Vector>& normals,
+	const Tree& kdTree, const Distance& tr_dist, float diagonal_length) {
+	int idx = 0;
+	for (auto& vertex : vertices) {
+		std::vector<int> neighbors;
+		std::vector<float> neighbor_dist;
+		Vector normal = normals[idx];
 
-	try {
-		boost::dijkstra_shortest_paths(mst.graph, this_v,
-			boost::distance_map(distmap).visitor(vis).
-			weight_map(boost::get(&EdgeProperty::count_weight, mst.graph))
-		);
+		int neighbor_num = 192;
+		kNN_search(idx, vertex, kdTree, tr_dist, neighbor_num,
+			neighbors, neighbor_dist);
 
-		std::cout << "No path found" << std::endl;
-	}
-	catch (my_visitor::enough const&) {
-		return;
-	}
-}
+		float weight_sum = 0.;
+		float amp_sum = 0.;
+		float max_dist = 0.;
+		int added = 0;
+		std::vector<float> vertical_length;
+		std::vector<float> weights;
+		for (auto& neighbor : neighbors) {
+			Point neighbor_pos = vertices[neighbor];
+			Vector n2this = neighbor_pos - vertex;
+			if (normals[neighbor] * normal < std::cos(30. / 180. * CGAL_PI)) {
+				continue;
+			}
+			float vertical = n2this * normal;
+			float n_dist = norm(neighbor_pos - vertex);
 
-Vertex travel_ccw(m_Graph& g, Vertex current_vertex, Vertex last_vertex) {
-	/*std::vector<int> current_neighbors = g.graph[current_vertex].ordered_neighbors;
-	int idx = -1;
-	for (int i = 0; i < current_neighbors.size(); i++) {
-		if (current_neighbors[i] == int(last_vertex)) {
-			idx = i;
-			break;
+			float tangential_square = n_dist * n_dist -
+				vertical * vertical;
+			float tangential_dist = 0.;
+			if (tangential_square > 0.)
+				tangential_dist = std::sqrt(tangential_square);
+			if (!isfinite(tangential_dist)) {
+				std::cout << n_dist << " " << vertical << std::endl;
+				std::cout << "error" << std::endl;
+			}
+			float weight = -tangential_dist;
+			if (tangential_dist > max_dist)
+				max_dist = tangential_dist;
+
+			weights.push_back(weight);
+			vertical_length.push_back(vertical);
+			added++;
 		}
-	}
-	if (idx == -1)
-		throw std::runtime_error("No neighbor found (caused by wrong ordered_neighbors)");
-	int this_v_id = g.graph[current_vertex].
-		ordered_neighbors[python_mod((idx + 1), current_neighbors.size())];
-	return this_v_id;
-	 */
-    return successor(g,current_vertex,last_vertex).v;
-}
-
-Vertex travel_cw(m_Graph& g, Vertex current_vertex, Vertex last_vertex) {
-	/*std::vector<int> current_neighbors = g.graph[current_vertex].ordered_neighbors;
-	int idx = -1;
-	for (int i = 0; i < current_neighbors.size(); i++) {
-		if (current_neighbors[i] == int(last_vertex)) {
-			idx = i;
-			break;
+		for (int i = 0; i < vertical_length.size(); i++) {
+			amp_sum += vertical_length[i] * (weights[i] + max_dist);
+			weight_sum += weights[i] + max_dist;
 		}
-	}
-	if (idx == -1)
-		throw std::runtime_error("No neighbor found (caused by wrong ordered_neighbors)");
-	int this_v_id = g.graph[current_vertex].
-		ordered_neighbors[python_mod((idx - 1), current_neighbors.size())];
-	return this_v_id;
-	 */
-    return predecessor(g,current_vertex,last_vertex).v;
-}
 
-float cal_proj_dist(const Vector& edge, Vector& this_normal, Vector& neighbor_normal) {
-	float Euclidean_dist = norm(edge);
-	/*Vector sum_normal;
-	if (this_normal * neighbor_normal > 0)
-		sum_normal = normalize_vector(normalize_vector(this_normal) +
-			normalize_vector(neighbor_normal));
-	else
-		sum_normal = normalize_vector(normalize_vector(this_normal) -
-			normalize_vector(neighbor_normal));
-	float normal_length = edge * sum_normal;
-	float projection_dist = sqrtf((Euclidean_dist * Euclidean_dist)
-		- (normal_length * normal_length));*/
-	float neighbor_normal_length = edge * normalize_vector(neighbor_normal);
-	float normal_length = edge * normalize_vector(this_normal);
-	float projection_dist = sqrtf((Euclidean_dist * Euclidean_dist) - (normal_length * normal_length));
-	projection_dist += sqrtf((Euclidean_dist * Euclidean_dist) -
-		(neighbor_normal_length * neighbor_normal_length));
-	projection_dist /= 2.;
-	if (std::abs(normalize_vector(this_normal) * normalize_vector(neighbor_normal)) < std::cos(15./180.* CGAL_PI))
-		projection_dist = Euclidean_dist;
-	return projection_dist;
+		if (weight_sum == 0.)
+			weight_sum = 1.;
+		amp_sum /= weight_sum;
+		if (!isfinite(amp_sum))
+			std::cout << "error" << std::endl;
+		Vector move = amp_sum * normal;
+		smoothed_v.push_back(vertex + move);
+		idx++;
+	}
 }

@@ -25,15 +25,15 @@ inline bool face_comparator(const m_face_pair& l, const m_face_pair& r) {
 bool isIntersecting(m_Graph& mst, Vertex v1, Vertex v2, Vertex v3, Vertex v4);
 
 void build_mst(m_Graph&, std::vector<Vertex>&,
-	bool, bool, const std::vector<Point>&,
+	bool, const std::vector<Point>&,
 	std::vector<Vector>&);
 
-bool geometry_check(m_Graph& mst, m_Edge& candidate, Tree& kdTree, Distance& tr_dist, float);
+bool geometry_check(m_Graph& mst, m_Edge& candidate, Tree& kdTree, Distance& tr_dist);
 
-bool Vanilla_check(m_Graph& g, m_Edge& candidate, Tree& kdTree, Distance& tr_dist, float);
+bool Vanilla_check(m_Graph& g, m_Edge& candidate, Tree& kdTree, Distance& tr_dist);
 
-void connect_handle(const std::vector<Point>&,
-	Timer&, Tree&, Distance&,
-	m_Graph&, std::vector<Vertex>& connected_handle_root, std::vector<int>& betti, int k = 8, bool isEuclidean = false);
+void connect_handle(const std::vector<Point>&, Tree&, Distance&,
+	m_Graph&, std::vector<Vertex>& connected_handle_root, std::vector<int>& betti,
+	int k = 8, bool isEuclidean = false, int step_thresh = 10);
 
 #endif //MST_H

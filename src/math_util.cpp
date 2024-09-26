@@ -1,6 +1,13 @@
 #include "math_util.h"
 
-
+/**
+ * @brief Calculate the reference vector for rotation system
+ *
+ * @param normal: normal direction for the target vertex
+ * @param ref_vec: [OUTPUT] output the reference vector
+ *
+ * @return None
+ */
 void calculate_ref_vec(const Vector& normal, Vector& ref_vec) {
 	float eps = 1e-6;
 	float second = normal[1];
@@ -13,14 +20,24 @@ void calculate_ref_vec(const Vector& normal, Vector& ref_vec) {
 	return;
 }
 
-int python_mod(int n, int M) {
-	return ((n % M) + M) % M;
-}
-
+/**
+ * @brief Calculate norm of Vector
+ *
+ * @param input: input vector
+ *
+ * @return norm of Vector
+ */
 float norm(Vector input) {
 	return std::sqrt(input.squared_length());
 }
 
+/**
+ * @brief Normalize the vector to norm 1
+ *
+ * @param input: vector to be normalized
+ *
+ * @return normalized vector
+ */
 std::vector<float> normalize_vector(std::vector<float>& input) {
 	float length = norm(Vector(input[0], input[1], input[2]));
 	for (int i = 0; i < input.size(); i++) {
@@ -29,16 +46,40 @@ std::vector<float> normalize_vector(std::vector<float>& input) {
 	return input;
 }
 
+/**
+ * @brief Normalize the Vector to norm 1
+ *
+ * @param input: Vector to be normalized
+ *
+ * @return normalized Vector
+ */
 Vector normalize_vector(const Vector& input) {
 	float length = norm(input);
 	return input / length;
 }
 
+/**
+ * @brief Project a vector to a plane
+ *
+ * @param input: Vector to be projected
+ * @param normal: normal to the plane
+ *
+ * @return projected Vector
+ */
 Vector projected_vector(Vector& input, Vector& normal) {
 	Vector normal_normed = normalize_vector(normal);
 	return input - input * normal_normed * normal_normed;
 }
 
+/**
+ * @brief Estimate normal
+ *
+ * @param neighbors: index of neighbors to be used to estimate normal
+ * @param vertices: the vertices of the whole point cloud
+ * @param normal: [OUTPUT] estimated normal
+ *
+ * @return None
+ */
 void est_normal_SVD(std::vector<int>& neighbors,
 	const std::vector<Point>& vertices, Vector& normal) {
 	Eigen::Matrix<float, 3, 11> mat;
@@ -61,15 +102,30 @@ void est_normal_SVD(std::vector<int>& neighbors,
 	return;
 }
 
+/**
+ * @brief Calculate cos angle weight for correcting normal orientation
+ *
+ * @param this_normal: normal of current vertex
+ * @param neighbor_normal: normal of its neighbor vertex
+ *
+ * @return angle weight calculated
+ */
 float cal_angle_based_weight(const Vector& this_normal, const Vector& neighbor_normal) {
-	float dot_pdt = abs(this_normal * neighbor_normal);
-	// NOTICE!!!!!!! Possible bugs here!!!!!  can comment clamp line to see what happens on bunny.obj!!!!!
+	float dot_pdt = abs(this_normal * neighbor_normal / norm(this_normal) / norm(neighbor_normal));
 	dot_pdt = boost::algorithm::clamp(dot_pdt, 0., 1.);
 	if (1. - dot_pdt < 0)
 		std::cout << "error" << std::endl;
 	return 1. - dot_pdt;
 }
 
+/**
+ * @brief Calculate the radian in the rotation system
+ *
+ * @param branch_vec: vector of the out-going edge
+ * @param normal: normal of the root vertex
+ *
+ * @return radian
+ */
 double cal_radians_3d(const Vector& branch_vec, const Vector& normal) {
     Vector proj_vec = branch_vec - (normal * branch_vec) /
                                    norm(normal) * normal;
@@ -91,6 +147,15 @@ double cal_radians_3d(const Vector& branch_vec, const Vector& normal) {
     return radian;
 }
 
+/**
+ * @brief Calculate the radian given the reference vector
+ *
+ * @param branch_vec: vector of the out-going edge
+ * @param normal: normal of the root vertex
+ * @param ref_vec: the reference vector
+ *
+ * @return radian
+ */
 double cal_radians_3d(const Vector& branch_vec, const Vector& normal,const Vector& ref_vec) {
 	Vector proj_vec = branch_vec - (normal * branch_vec) / 
 		norm(normal) * normal;
@@ -108,94 +173,37 @@ double cal_radians_3d(const Vector& branch_vec, const Vector& normal,const Vecto
 	return radian;
 }
 
-float cal_quality_score(Point pos_i, Point pos_u, Point pos_w,
-	Vector normal_i, Vector normal_u, Vector normal_w, bool isEuclidean) {
-	float len_ui = norm(pos_u - pos_i);
-	float len_wi = norm(pos_w - pos_i);
-	float len_uw = norm(pos_u - pos_w);
-	// Project it into local 2D plane if it is too noisy.
-	if (!isEuclidean) {
-		Vector edge_ui = pos_u - pos_i;
-		float normal_i_length = edge_ui * normalize_vector(normal_i);
-		float normal_u_length = edge_ui * normalize_vector(normal_u);
-		len_ui = sqrtf((len_ui * len_ui) - (normal_i_length * normal_i_length)) +
-			sqrtf((len_ui * len_ui) - (normal_u_length * normal_u_length));
-		len_ui /= 2.;
-
-		Vector edge_wi = pos_w - pos_i;
-		normal_i_length = edge_wi * normalize_vector(normal_i);
-		float normal_w_length = edge_wi * normalize_vector(normal_w);
-		len_wi = sqrtf((len_wi * len_wi) - (normal_i_length * normal_i_length)) +
-			sqrtf((len_wi * len_wi) - (normal_w_length * normal_w_length));
-		len_wi /= 2.;
-
-		Vector edge_uw = pos_u - pos_w;
-		normal_w_length = edge_uw * normalize_vector(normal_w);
-		normal_u_length = edge_uw * normalize_vector(normal_u);
-		len_uw = sqrtf((len_uw * len_uw) - (normal_w_length * normal_w_length)) +
-			sqrtf((len_uw * len_uw) - (normal_u_length * normal_u_length));
-		len_uw /= 2.;
-	}
-	float max_value = std::acos(boost::algorithm::clamp(
-		(pos_w - pos_i) * (pos_u - pos_i) / len_ui /
-		len_wi, -1, 1));
-	float min_value = max_value;
-	float radian = std::acos(boost::algorithm::clamp(
-		(pos_i - pos_u) * (pos_w - pos_u) / len_ui /
-		len_uw, -1, 1));
-	if (radian > max_value)
-		max_value = radian;
-	if (radian < min_value)
-		min_value = radian;
-	radian = std::acos(boost::algorithm::clamp(
-		(pos_u - pos_w) * (pos_i - pos_w) / len_uw /
-		len_wi, -1, 1));
-	if (radian > max_value)
-		max_value = radian;
-	if (radian < min_value)
-		min_value = radian;
-	return max_value - min_value;
-}
-
-float cal_edge_score(Point pos_i, Point pos_u, Point pos_w,
-	Vector normal_u, Vector normal_w, float avg_edge_length, bool isEuclidean) {
-	/*float len_uw = norm(pos_u - pos_w);
-	if (!isEuclidean) {
-		Vector edge_uw = pos_u - pos_w;
-		float normal_w_length = edge_uw * normalize_vector(normal_w);
-		float normal_u_length = edge_uw * normalize_vector(normal_u);
-		len_uw = std::sqrtf(len_uw * len_uw - (normal_w_length * normal_w_length)) +
-			std::sqrtf(len_uw * len_uw - (normal_u_length * normal_u_length));
-		len_uw /= 2.;
-	}
-	return len_uw / (50 * avg_edge_length) * CGAL_PI;*/
-	float len_ui = norm(pos_u - pos_i);
-	float max_length = len_ui;
-	float len_wi = norm(pos_w - pos_i);
-	if (len_wi > max_length)
-		max_length = len_wi;
-	float len_uw = norm(pos_u - pos_w);
-	if (len_uw > max_length)
-		max_length = len_uw;
-	return std::abs(max_length - avg_edge_length) / avg_edge_length * CGAL_PI;
-}
-
-float cal_normal_score(Vector normal_i, Vector normal_u, Vector normal_w) {
-	return ((1 - normal_i * normal_u) + (1 - normal_i * normal_w)) * CGAL_PI / 4;
-}
-
+/**
+ * @brief Project a point to the triangle plane following a given direction
+ *
+ * @param v: point to be projected
+ * @param triangle_pos: point coordinates of 3 vertices of the triangle
+ * @param project_vec: direction the point moves along
+ *
+ * @return the projected point
+ */
 Point project_point_to_plane(Point& v, std::vector<Point>& triangle_pos,
 	Vector& project_vec) {
-	// result = v+kD = v+(n(p-v)/(n*D))D
+
 	Point i = triangle_pos[0];
 	Point u = triangle_pos[1];
 	Point w = triangle_pos[2];
 	Vector n = CGAL::cross_product(i - u, w - u);
 
-	Point result = v + (n*(i-v)/(n*project_vec))*project_vec;
+	Point result = v + (n * (i - v) / (n * project_vec)) * project_vec;
 	return result;
 }
 
+/**
+ * @brief Test if p1 and p2 are on the same side of a line defined by a and b
+ *
+ * @param p1: point 1
+ * @param p2: point2
+ * @param a: point one to define the line
+ * @param b: point two to define the line
+ *
+ * @return true if they are on the same side
+ */
 bool sameSide(Point& p1, Point& p2, Point& a, Point& b) {
 	Vector cp1 = CGAL::cross_product(b - a, p1 - a);
 	Vector cp2 = CGAL::cross_product(b - a, p2 - a);
@@ -204,6 +212,15 @@ bool sameSide(Point& p1, Point& p2, Point& a, Point& b) {
 	return false;
 }
 
+/**
+ * @brief Test a point is in a triangle (2D)
+ *
+ * @param p: 3D points in the space
+ * @param triangle_pos: point coordinates of 3 vertices of the triangle
+ * @param face_normal: the normal of the local surface, different from the plane defined by the triangle
+ *
+ * @return true the point is inside the triangle after projection.
+ */
 bool point_in_triangle(Point& p, std::vector<Point>& triangle_pos,
 	Vector& face_normal) {
 	Point p_prime = project_point_to_plane(p, triangle_pos, face_normal);
@@ -216,10 +233,18 @@ bool point_in_triangle(Point& p, std::vector<Point>& triangle_pos,
 	return false;
 }
 
+/**
+ * @brief Data type transfer
+ *
+ */
 Vector vector2Vector(const std::vector<float>& input) {
 	return Vector(input.at(0), input.at(1), input.at(2));
 }
 
+/**
+ * @brief Data type transfer
+ *
+ */
 void Vector2vector(Vector input, std::vector<float>& output) {
 	output.at(0) = input.x();
 	output.at(1) = input.y();
@@ -227,6 +252,18 @@ void Vector2vector(Vector input, std::vector<float>& output) {
 	return;
 }
 
+/**
+ * @brief Add noise to the point
+ *
+ * @param noise_type: type of the noise added
+ * @param vertices: all the vertices of the point cloud
+ * @param normal: corresponding normal of vertices
+ * @param sigma: standard deviation of the noise
+ * @param amplitude: amplitude of the noise
+ * @param avg_length: average length of the kNN graph edges
+ *
+ * @return None
+ */
 void add_noise(std::string noise_type, std::vector<Point>& vertices,
 	const std::vector<Vector>& normal, float sigma, float amplitude, float avg_length) {
 
@@ -285,6 +322,14 @@ void add_noise(std::string noise_type, std::vector<Point>& vertices,
 	return;
 }
 
+/**
+ * @brief Add noise to the normal
+ *
+ * @param angle: the maximum angle the normal can pivot compared to the original direction
+ * @param normals: normals exposed to noise
+ *
+ * @return None
+ */
 void add_normal_noise(float angle, std::vector<Vector>& normals) {
 	const int seed = 3;
 	std::mt19937 mt;
@@ -307,10 +352,37 @@ void add_normal_noise(float angle, std::vector<Vector>& normals) {
 	}
 }
 
+/**
+ * @brief Calculate the local surface normal (averaged direction of normals of 3 vertices in the triangle)
+ *
+ * @return local surface normal
+ */
 Vector triangle_mean_normal(const Vector& normal1, const Vector& normal2, const Vector& normal3) {
 	Vector normal1_norm = normalize_vector(normal1);
 	Vector normal2_norm = normalize_vector(normal2);
 	Vector normal3_norm = normalize_vector(normal3);
 	Vector output = normal1_norm + normal2_norm + normal3_norm;
 	return normalize_vector(output);
+}
+
+/**
+ * @brief Calculate projection distance
+ *
+ * @param edge: the edge to be considered
+ * @param this_normal: normal of one vertex
+ * @param neighbor_normal: normal of another vertex
+ * 
+ * @return projection distance
+ */
+float cal_proj_dist(const Vector& edge, Vector& this_normal, Vector& neighbor_normal) {
+	float Euclidean_dist = norm(edge);
+	float neighbor_normal_length = edge * normalize_vector(neighbor_normal);
+	float normal_length = edge * normalize_vector(this_normal);
+	float projection_dist = sqrtf((Euclidean_dist * Euclidean_dist) - (normal_length * normal_length));
+	projection_dist += sqrtf((Euclidean_dist * Euclidean_dist) -
+		(neighbor_normal_length * neighbor_normal_length));
+	projection_dist /= 2.;
+	if (std::abs(normalize_vector(this_normal) * normalize_vector(neighbor_normal)) < std::cos(15. / 180. * CGAL_PI))
+		projection_dist = Euclidean_dist;
+	return projection_dist;
 }

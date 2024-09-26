@@ -4,8 +4,10 @@ out_root ./output
 out_name bunny_example
 isEuclidean false
 isGTNormal false
-isLeastEdgeScore true
-isProgressive true
 isNoiseExp false
 genus 0
 k 70
+r 20
+// theta in degrees
+theta 60
+n 50

@@ -1,5 +1,18 @@
 #include"normal.h"
 
+/**
+ * @brief Estimate normal using CGAL built-in function
+ *
+ * @param vertices: vertices of the point cloud
+ * @param kdTree: kd-tree for knn query
+ * @param tr_dist: distance container
+ * @param isGTNormal: boolean determining if the program is using provided normal
+ * @param normals: [IN/OUT] normal of the point cloud
+ * @param zero_normal_id: [IN/OUT] list of indices of invalid normal values ([0,0,0])
+ * @param diagonal_length: [OUT] the diagonal length of the point cloud
+ * 
+ * @return None
+ */
 void estimate_normal(const std::vector<Point>& vertices,
 	const Tree& kdTree, const Distance& tr_dist, bool isGTNormal,
 	std::vector<Vector>& normals, std::vector<int>& zero_normal_id,
@@ -58,6 +71,17 @@ void estimate_normal(const std::vector<Point>& vertices,
 	return;
 }
 
+/**
+ * @brief Fix invalid normal value - [0, 0, 0] - by re-estimating it with its neighbors
+ *
+ * @param zero_normal_id: list of indices of invalid normal values ([0,0,0])
+ * @param kdTree: kd-tree for knn query
+ * @param tr_dist: distance container
+ * @param vertices: vertices of the point cloud
+ * @param normals: [OUT] normal of the point cloud
+ *
+ * @return None
+ */
 void replace_zero_normal(const std::vector<int>& zero_normal_id,
 	const Tree& kdTree, const Distance& tr_dist, const std::vector<Point>& vertices,
 	std::vector<Vector>& normals) {
@@ -84,6 +108,14 @@ void replace_zero_normal(const std::vector<int>& zero_normal_id,
 	}
 }
 
+/**
+ * @brief Determine the normal orientation
+ *
+ * @param G_angle graph whose edges have angle-based weight
+ * @param normals: [OUT] normal of the point cloud with orientation corrected
+ *
+ * @return None
+ */
 void correct_normal_orientation(s_Graph& G_angle, std::vector<Vector>& normals) {
 	std::vector<bool> visited_vertex(boost::num_vertices(G_angle), false);
 	// Start from vertex 0
@@ -105,66 +137,5 @@ void correct_normal_orientation(s_Graph& G_angle, std::vector<Vector>& normals) 
 				}
 			}
 		}
-	}
-}
-
-void weighted_smooth(const std::vector<Point>& vertices,
-	std::vector<Point>& smoothed_v, const std::vector<Vector>& normals,
-	const Tree& kdTree, const Distance& tr_dist, float diagonal_length) {
-	int idx = 0;
-	for (auto& vertex : vertices) {
-		std::vector<int> neighbors;
-		std::vector<float> neighbor_dist;
-		Vector normal = normals[idx];
-
-		int neighbor_num = 192;
-		kNN_search(idx, vertex, kdTree, tr_dist, neighbor_num,
-			neighbors, neighbor_dist);
-
-		float weight_sum = 0.;
-		float amp_sum = 0.;
-		float max_dist = 0.;
-		int added = 0;
-		std::vector<float> vertical_length;
-		std::vector<float> weights;
-		for (auto& neighbor : neighbors) {
-			Point neighbor_pos = vertices[neighbor];
-			Vector n2this = neighbor_pos - vertex;
-			if (normals[neighbor] * normal < std::cos(30. / 180. * CGAL_PI)) {
-				continue;
-			}
-			float vertical = n2this * normal;
-			float n_dist = norm(neighbor_pos - vertex);
-			
-			float tangential_square = n_dist * n_dist -
-				vertical * vertical;
-			float tangential_dist = 0.;
-			if (tangential_square > 0.)
-				tangential_dist = std::sqrt(tangential_square);
-			if (!isfinite(tangential_dist)) {
-				std::cout << n_dist << " " << vertical << std::endl;
-				std::cout << "error" << std::endl;
-			}
-			float weight = -tangential_dist;
-			if (tangential_dist > max_dist)
-				max_dist = tangential_dist;
-			// TODO: Fix the weight!
-			weights.push_back(weight);
-			vertical_length.push_back(vertical);
-			added++;
-		}
-		for (int i = 0; i < vertical_length.size(); i++) {
-			amp_sum += vertical_length[i] * (weights[i] + max_dist);
-			weight_sum += weights[i] + max_dist;
-		}
-
-		if (weight_sum == 0.)
-			weight_sum = 1.;
-		amp_sum /= weight_sum;
-		if (!isfinite(amp_sum))
-			std::cout << "error" << std::endl;
-		Vector move = amp_sum * normal;
-		smoothed_v.push_back(vertex + move);
-		idx++;
 	}
 }

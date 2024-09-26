@@ -13,7 +13,6 @@
 #include "io.h"
 #include "math_util.h"
 #include "graph_utils.h"
-#include "eval.h"
 #include "normal.h"
 #include "mst.h"
 #include "timer.h"
@@ -37,15 +36,14 @@ public:
 	Reconstructor() {
 		isNoiseExperiment = false;
 		isDTUGeneration = false;
-		isBoxSample = false;
 		isEuclidean = true;
 		isGTNormal = false;
-		isProgressive = true;
-		isDebug = true;
+		isDebug = false;
 		isFaceLoop = true;
-		chamfer_sample = 100000;
-		isLeastEdgeScore = false;
 		k = 30;
+		r = 20.;
+		n = 50;
+		theta = 60.;
 		exp_genus = -1;
 		set_mode();
 	}
@@ -54,15 +52,14 @@ public:
 	Reconstructor(fs::path in_config_path) {
 		isNoiseExperiment = false;
 		isDTUGeneration = false;
-		isBoxSample = false;
 		isEuclidean = true;
 		isGTNormal = false;
-		isProgressive = true;
 		isFaceLoop = true;
-		isLeastEdgeScore = false;
-		isDebug = true;
-		chamfer_sample = 100000;
+		isDebug = false;
 		k = 30;
+		r = 20.;
+		n = 50;
+		theta = 60.;
 		exp_genus = -1;
 		config_path = in_config_path;
 		read_config(config_path);
@@ -79,17 +76,11 @@ public:
 		return model_path;
 	}
 
-    void reconstruct_single(std::string noise_type = "", float sigma = 0, float amplitude = 0, bool isStepSave = true, float thresh_r = -1);
-
-	void reconstruct_single(m_Model& ReconModel, m_Model& GTModel,
-		std::string noise_type = "", float sigma = 0, float amplitude = 0, bool isStepSave = true, float thresh_r = -1);
+	void reconstruct_single(std::string noise_type = "", float sigma = 0, float amplitude = 0);
 	
 	int reconstruct();
 
-    void traverse_and_reconstruct(const fs::path& dirPath, int k);
-
-    // Experiment needs
-	fs::path generate_box_samples(int);
+    void traverse_and_reconstruct(const fs::path& dirPath);
 
 	void noise_experiment();
 
@@ -100,15 +91,14 @@ public:
 private:
 	bool isNoiseExperiment;
 	bool isDTUGeneration;
-	bool isBoxSample;
 	bool isEuclidean;
 	bool isGTNormal;
-	bool isProgressive;
 	bool isDebug;
 	bool isFaceLoop;
-	bool isLeastEdgeScore;
-	int chamfer_sample;
 	int k;
+	float r;
+	float theta;
+	int n;
 	int exp_genus;
 	fs::path model_path;
 	fs::path root_path;
@@ -119,9 +109,7 @@ private:
 	string mode;
 
 	void set_mode() {
-		if (isBoxSample)
-			mode = "box_sample";
-		else if (model_name == "all")
+		if (model_name == "all")
 			mode = "recon_folder";
 		else if (isNoiseExperiment)
 			mode = "noise";
@@ -130,5 +118,4 @@ private:
 		else
 			mode = "single_file";
 	}
-
 };

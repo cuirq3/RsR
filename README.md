@@ -88,7 +88,7 @@ cd RsR
 ```
 mkdir build
 cd build
-// You can choose compiler with specifying -G argument after cmake command.
+// You can choose compiler by specifying -G argument after cmake command.
 cmake -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release ..
 ```
 - Build - Manually do it in the IDE or run the following command
@@ -193,12 +193,25 @@ cd ..
 A reconstructed bunny should be found in the **output** folder.
 
 # Config file
-You can modify the config file to adapt the software to different scenarios.
+You can modify the config file to adapt the software to different scenarios. The arguments are explained here:
 
+- **root**: the input point cloud file's root folder path
+- **model_name**: the file name of the point cloud with file type (e.g. pc.ply). You can specify it as "all" if you want to reconstruct all point cloud files in the root folder
+- **out_root**: the output root folder path
+- **out_name**: the expected name without suffix (e.g. output)
+- **isEuclidean**: if the input point cloud is from a synthetic mesh (not scanned), set this argument to **true** to use Euclidean distance. If it's a scanned point cloud, please set it to false. The program will use projection distance for better performance.
+- **isGTNormal**: if the normal is provided in the input file
+- **isNoiseExp**: setting this to true will enable the noise experiment (adding random noise to the input). This is a setting for experiment and evaluation of our method. For regular usage, please set it to false.
+- **genus**: the expected genus number if you have prior knowledge to the shape. Otherwise, you can comment it and the program will connect handle according to the other argument **n**.
+- **k**: the number of neighbors for each vertex to connect in the initial graph. Larger k ensures a sufficient connection but will take longer time to reconstruct.
+- **r**: a threshold to remove outlier vertices. If a vertex's connections are all longer than r times of the average edge length in the initial graph, this vertex will be removed from the final reconstruction.
+- **theta**: an angle threshold to avoid connecting vertices in different planes.
+- **n**: threshold for connecting handles. The edge number of the shortest path in graph should be larger than n for a handle to be considered not a spurious one.
 # Results reproduction
 
 # Acknowledgments
-
+We thank all data providers: the Stanford Computer Graphics Laboratory; Qingnan Zhou and Alec Jacobson; Chu et al.; Armeni et al.; Matterport, Inc.; Knapitsch et al.; and Anderson Winkler. We
+thank the anonymous reviewers for their helpful comments. This work is partially supported by a DTU alliance scholarship, the Danish Council for Independent Research (6111-00552B), the Carlsberg Foundation (CF21-0302), and the German Research Foundation (Gottfried Wilhelm Leibniz programme).
 # BibTeX
 
 ```

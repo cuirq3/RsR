@@ -86,7 +86,6 @@ bool check_face_overlap(m_Graph& G, std::vector<Vertex>& face,
 	std::vector<float> dists;
 	kNN_search(v_i, centroid, KDTree, tr_dist, k, neighbors, dists, false);
 
-	//Vector face_normal = CGAL::cross_product(pos_i - pos_u, pos_w - pos_u);
 	Vector face_normal = triangle_mean_normal(normal_i, normal_u, normal_w);
 	face_normal = normalize_vector(face_normal);
 	if (normal_i * face_normal < 0)
@@ -100,20 +99,6 @@ bool check_face_overlap(m_Graph& G, std::vector<Vertex>& face,
 		if (neighbor == v_i || neighbor == v_u ||
 			neighbor == v_w || neighbor_normal * face_normal < 0)
 			continue;
-		//std::vector<int> neighbors_neighbor = G.graph[v_neighbor].ordered_neighbors;
-
-		//// Ignore closed vertex
-		//if (neighbors_neighbor.size() > 2) {
-		//	bool isClosed = true;
-		//	for (int j = 0; j < neighbors_neighbor.size(); j++) {
-		//		if (!boost::edge(get_vertex(G, neighbors_neighbor[j]), get_vertex(G, neighbors_neighbor[python_mod(j + 1, neighbors_neighbor.size())]), G.graph).second) {
-		//			isClosed = false;
-		//			break;
-		//		}
-		//	}
-		//	if (isClosed)
-		//		continue;
-		//}
 
 		if (point_in_triangle(neighbor_pos, triangle_pos, face_normal))
 			return true;

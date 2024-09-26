@@ -15,8 +15,6 @@ typedef Kernel::Vector_3 Vector;
 
 void calculate_ref_vec(const Vector&, Vector&);
 
-int python_mod(int, int);
-
 float norm(Vector);
 
 double cal_radians_3d(const Vector& branch_vec, const Vector& normal);
@@ -34,14 +32,6 @@ Vector projected_vector(Vector& input, Vector& normal);
 void est_normal_SVD(std::vector<int>&,
 	const std::vector<Point>&, Vector&);
 
-float cal_quality_score(Point, Point, Point, Vector,
-	Vector, Vector, bool);
-
-float cal_edge_score(Point, Point, Point, Vector,
-	Vector, float, bool);
-
-float cal_normal_score(Vector, Vector, Vector);
-
 Point project_point_to_plane(Point&, std::vector<Point>&, Vector&);
 
 bool sameSide(Point&, Point&, Point&, Point&);
@@ -58,5 +48,8 @@ void add_noise(std::string, std::vector<Point>&,
 void add_normal_noise(float angle, std::vector<Vector>& normals);
 
 Vector triangle_mean_normal(const Vector&, const Vector&, const Vector&);
+
+float cal_proj_dist(const Vector& edge,
+	Vector& this_normal, Vector& neighbor_normal);
 
 #endif
