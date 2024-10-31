@@ -279,7 +279,7 @@ void init_graph(const std::vector<Point>& vertices, const std::vector<Point>& sm
 				float cos_theta = this_normal * neighbor_normal /
 					std::sqrt(this_normal.squared_length()) /
 					std::sqrt(neighbor_normal.squared_length());
-				float cos_thresh = std::cos(60. / 180. * CGAL_PI);
+				float cos_thresh = std::cos(cross_conn_thresh / 180. * CGAL_PI);
 				if (isEuclidean)
 					cos_thresh = 0.;
 				if (cos_theta >= cos_thresh) {

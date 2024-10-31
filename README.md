@@ -207,11 +207,11 @@ You can modify the config file to adapt the software to different scenarios. The
 - **r**: a threshold to remove outlier vertices. If a vertex's connections are all longer than r times of the average edge length in the initial graph, this vertex will be removed from the final reconstruction.
 - **theta**: an angle threshold to avoid connecting vertices in different planes.
 - **n**: threshold for connecting handles. The edge number of the shortest path in graph should be larger than n for a handle to be considered not a spurious one.
+- **isDebug**: by default is false. You can set it to true if you want some intermediate results exported.
 # Results reproduction
 
 # Acknowledgments
-We thank all data providers: the Stanford Computer Graphics Laboratory; Qingnan Zhou and Alec Jacobson; Chu et al.; Armeni et al.; Matterport, Inc.; Knapitsch et al.; and Anderson Winkler. We
-thank the anonymous reviewers for their helpful comments. This work is partially supported by a DTU alliance scholarship, the Danish Council for Independent Research (6111-00552B), the Carlsberg Foundation (CF21-0302), and the German Research Foundation (Gottfried Wilhelm Leibniz programme).
+We thank all data providers: the Stanford Computer Graphics Laboratory; Qingnan Zhou and Alec Jacobson; Chu et al.; Armeni et al.; Matterport, Inc.; Knapitsch et al.; and Anderson Winkler. We thank the anonymous reviewers for their helpful comments. This work is partially supported by a DTU alliance scholarship, the Danish Council for Independent Research (6111-00552B), the Carlsberg Foundation (CF21-0302), and the German Research Foundation (Gottfried Wilhelm Leibniz programme).
 # BibTeX
 
 ```
