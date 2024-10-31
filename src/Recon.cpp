@@ -426,7 +426,7 @@ void Reconstructor::reconstruct_single(std::string noise_type, float sigma, floa
         // Vanilla MST imp
         bettiNum_1 = 0;
         betti_1.push_back(bettiNum_1);
-        int inserted_edge = 0;
+        //int inserted_edge = 0;
         if (true)
         {
             // Edge connection
@@ -448,18 +448,18 @@ void Reconstructor::reconstruct_single(std::string noise_type, float sigma, floa
                     if(isAdded)
                         betti_1.push_back(bettiNum_1);
                     //Script to make FF video
-                    inserted_edge++;
+                    /*inserted_edge++;
                     if (inserted_edge % int(86717 / 96) == 0) {
                         fs::path out_path = out_root_path / ("Frame_" + std::to_string(int(inserted_edge/int(86717 /96))) + ".obj");
                         IO.export_obj(vertices, mst, out_path, faces);
                         out_path = out_root_path / ("Graph_Frame_" + std::to_string(int(inserted_edge / int(86717 / 96))) + ".obj");
                         IO.export_graph(mst, out_path);
-                    }
+                    }*/
                 }
             }
             showProgressBar(1.0);
             std::cout << std::endl;
-            std::cout << inserted_edge << std::endl;
+            //std::cout << inserted_edge << std::endl;
 
             // Output
             if (exp_genus != 0 && isDebug) {
