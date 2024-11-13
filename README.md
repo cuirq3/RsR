@@ -21,7 +21,7 @@ This is the official implementation of
 <sup>2</sup> Visual Computing Institute, RWTH Aachen University, Germany
 </font>
 
-| <a href="">Webpage(TODO)</a> | <a href="https://arxiv.org/abs/2402.01893">arXiv</a> | <a href="">Presentation video(TODO, link)</a> |
+| <a href="https://cuirq3.github.io/projects/siga_24/">Webpage(TODO)</a> | <a href="https://arxiv.org/abs/2402.01893">arXiv</a> | <a href="https://www.youtube.com/watch?v=9DEfhN3pzng">Youtube</a> | <a href="https://www.bilibili.com/video/BV1HzmrY5E6S/">Bilibili</a> |
 
 <img src="./pics/teaser.png" alt="teaser.png"/><img src="./pics/Scene_Stanford.png" alt="stanford.png"/> <br>
 <!-- <b>Our method extracts meshes from 3D Gaussian Splatting reconstructions and builds hybrid representations <br>that enable easy composition and animation in Gaussian Splatting scenes by manipulating the mesh.</b> -->
@@ -50,6 +50,7 @@ control over the topology of the reconstructed surface._
 <details>
 <summary><span style="font-weight: bold;">To-do list</span></summary>
 <ul>
+  <li><b>Integration:</b> Embed our code into Pygel.</li>
   <li><b>Improvement:</b> Remove the reliance on 3rd party libraries.</li>
 </ul>
 </details>
