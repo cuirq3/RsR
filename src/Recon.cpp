@@ -1,4 +1,5 @@
 #include "Recon.h"
+#include <boost/filesystem.hpp>
 
 /**
  * @brief Read the input config file and initialize

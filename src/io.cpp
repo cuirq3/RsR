@@ -253,15 +253,11 @@ void io_system::read_pc_ply(fs::path file_path, std::vector<Point>& vertices,
 	}
 
 	std::vector<int> idx_array(vertex_pos.size());
+	std::iota(idx_array.begin(), idx_array.end(), 0);
 	bool downSample = false;
 	if (downSample) {
 		int num_sample = 2000000;
 		if (vertex_pos.size() > 2000000) {
-			// Populate the vector
-			for (int i = 0; i < vertex_pos.size(); i++) {
-				idx_array[i] = i;
-			}
-
 			std::random_device rd;
 			std::mt19937 g(rd());
 			std::shuffle(idx_array.begin(), idx_array.end(), g);
