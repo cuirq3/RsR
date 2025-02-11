@@ -4,7 +4,8 @@
 
 This is the official implementation of
 
-## Surface Reconstruction Using Rotation Systems
+## Surface Reconstruction Using Rotation Systems (SIGGRAPH ASIA 2024, TOG)
+
 
 <font size="4">
 <a href="https://cuirq3.github.io/" style="font-size:100%;">Ruiqi Cui<sup>1</sup></a>&emsp;
@@ -21,7 +22,7 @@ This is the official implementation of
 <sup>2</sup> Visual Computing Institute, RWTH Aachen University, Germany
 </font>
 
-| <a href="">Webpage</a> | <a href="https://arxiv.org/abs/2402.01893">arXiv</a> | <a href="">Presentation video(TODO, link)</a> |
+| <a href="https://cuirq3.github.io/projects/siga_24/">Webpage</a> | <a href="https://dl.acm.org/doi/10.1145/3687956">Paper</a> | <a href="https://arxiv.org/abs/2402.01893">arXiv</a> | <a href="https://www.youtube.com/watch?v=9DEfhN3pzng">Youtube</a> | <a href="https://www.bilibili.com/video/BV1HzmrY5E6S/">Bilibili</a> |
 
 <img src="./pics/teaser.png" alt="teaser.png"/><img src="./pics/Scene_Stanford.png" alt="stanford.png"/> <br>
 <!-- <b>Our method extracts meshes from 3D Gaussian Splatting reconstructions and builds hybrid representations <br>that enable easy composition and animation in Gaussian Splatting scenes by manipulating the mesh.</b> -->
@@ -50,6 +51,7 @@ control over the topology of the reconstructed surface._
 <details>
 <summary><span style="font-weight: bold;">To-do list</span></summary>
 <ul>
+  <li><b>Integration:</b> Embed our code into Pygel.</li>
   <li><b>Improvement:</b> Remove the reliance on 3rd party libraries.</li>
 </ul>
 </details>
@@ -215,10 +217,21 @@ We thank all data providers: the Stanford Computer Graphics Laboratory; Qingnan 
 # BibTeX
 
 ```
-@article{cui2024surface,
-  title={Surface Reconstruction Using Rotation Systems},
-  author={Cui, Ruiqi and G{\ae}de, Emil Toftegaard and Rotenberg, Eva and Kobbelt, Leif and B{\ae}rentzen, J Andreas},
-  journal={arXiv preprint arXiv:2402.01893},
-  year={2024}
+@article{10.1145/3687956,
+author = {Cui, Ruiqi and G\ae{}de, Emil Toftegaard and Rotenberg, Eva and Kobbelt, Leif and B\ae{}rentzen, J. Andreas},
+title = {Surface Reconstruction Using Rotation Systems},
+year = {2024},
+issue_date = {December 2024},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {43},
+number = {6},
+issn = {0730-0301},
+doi = {10.1145/3687956},
+journal = {ACM Trans. Graph.},
+month = nov,
+articleno = {190},
+numpages = {22},
+keywords = {triangle mesh, surface reconstruction, point cloud, graph}
 }
 ```
