@@ -390,6 +390,8 @@ void triangulate(std::vector<Face>& faces, m_Graph& G,
 
 	float avg_edge_length = G.total_edge_length / boost::num_edges(G.graph);
 
+	//std::cout << boost::num_edges(G.graph) << std::endl;
+
 	// Init priority queue
 	for (int i = 0; i < boost::num_vertices(G.graph); i++) {
 		to_visit.insert(i);

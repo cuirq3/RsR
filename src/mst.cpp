@@ -62,7 +62,7 @@ void build_mst(m_Graph& mst, std::vector<Vertex>& p,
 
 				auto neighbors = boost::adjacent_vertices(parent, mst_temp);
 				for (auto neighbor : make_iterator_range(neighbors)) {
-					if (mst.graph[neighbor].normal_rep >= -1) {
+					if (mst.graph[neighbor].normal_rep == -1) {
 						mst.graph[neighbor].normal_rep = parent;
 					}
 					else {

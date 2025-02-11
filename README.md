@@ -21,7 +21,7 @@ This is the official implementation of
 <sup>2</sup> Visual Computing Institute, RWTH Aachen University, Germany
 </font>
 
-| <a href="">Webpage(TODO)</a> | <a href="https://arxiv.org/abs/2402.01893">arXiv</a> | <a href="">Presentation video(TODO, link)</a> |
+| <a href="">Webpage</a> | <a href="https://arxiv.org/abs/2402.01893">arXiv</a> | <a href="">Presentation video(TODO, link)</a> |
 
 <img src="./pics/teaser.png" alt="teaser.png"/><img src="./pics/Scene_Stanford.png" alt="stanford.png"/> <br>
 <!-- <b>Our method extracts meshes from 3D Gaussian Splatting reconstructions and builds hybrid representations <br>that enable easy composition and animation in Gaussian Splatting scenes by manipulating the mesh.</b> -->

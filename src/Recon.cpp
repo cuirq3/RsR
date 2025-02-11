@@ -9,6 +9,9 @@
 void Reconstructor::read_config(fs::path config_path) {
     fs::ifstream config(config_path);
     string line;
+    if (!fs::exists(config_path)) {
+        throw std::runtime_error("Error opening config file!");
+    }
     std::vector<string> tokens;
     while (getline(config, line)) {
         std::size_t pos = 0, found;
@@ -273,6 +276,9 @@ void Reconstructor::reconstruct_single(std::string noise_type, float sigma, floa
         Distance tr_dist;
 
         // Correct orientation
+
+        // TODO: Seems not considerring the number of connected components when correct orientation!!!
+
         if (!isGTNormal) {
             s_Graph g_angle(in_vertices.size());
             s_weightMap weightmap_a = boost::get(boost::edge_weight, g_angle);
@@ -407,7 +413,6 @@ void Reconstructor::reconstruct_single(std::string noise_type, float sigma, floa
                 std::sort(edge_length.begin(), edge_length.end(), edge_comparator);
             }
         }
-
         recon_timer.end("Build MST");
 
         // Export MST
@@ -440,7 +445,6 @@ void Reconstructor::reconstruct_single(std::string noise_type, float sigma, floa
 
                 if (boost::edge(this_edge.first, this_edge.second, mst.graph).second)
                     continue;
-
                 bool isValid = Vanilla_check(mst, this_edge, kdTree, tr_dist);
 
                 if (isValid) {
@@ -469,7 +473,6 @@ void Reconstructor::reconstruct_single(std::string noise_type, float sigma, floa
                 IO.export_graph(mst, out_path);
             }
         }
-
         // Create handles & Triangulation
         if (exp_genus != 0) {
             mst.isFinalize = true;
