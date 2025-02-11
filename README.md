@@ -4,7 +4,7 @@
 
 This is the official implementation of
 
-## Surface Reconstruction Using Rotation Systems (SIGGRAPH ASIA 2024, TOG)
+## Surface Reconstruction Using Rotation Systems <br> (SIGGRAPH ASIA 2024, TOG)
 
 
 <font size="4">
