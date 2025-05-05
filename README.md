@@ -201,7 +201,7 @@ After installation, a great test would be to reconstruct the well-known [Stanfor
 
 Note: the commands should follow right after the installation. (Make sure you are at the correct working directory)
 
-Go to the root folder.
+**Go to the root folder.**
 ```
 cd ..
 ```
