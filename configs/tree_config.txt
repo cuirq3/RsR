@@ -1,0 +1,10 @@
+root ./example
+model_name tree.obj
+out_root ./output
+out_name tree
+isEuclidean false
+isGTNormal true
+k 150
+theta 150
+n 10
+//isDebug true

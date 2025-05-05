@@ -215,8 +215,8 @@ bool geometry_check(m_Graph& mst, m_Edge& candidate, Tree& kdTree,
 	std::vector<float> distance;
 	NN_search(-1, search_center, kdTree, tr_dist, float(radius * 3.), neighbors, distance, false);
 
-	/*if ((v1 == 30045 && v2 == 69461) || v1 == 69461 && v2 == 30045)
-		std::cout << "debug here" << std::endl;*/
+	//if ((v1 == 1068 && v2 == 133393) || v1 == 133393 && v2 == 1068)
+	//	std::cout << "debug here" << std::endl;
 	// Start neighbors check
 	float query_radian1 = cal_radians_3d(p1 - search_center, mean_normal);
 	float query_radian2 = cal_radians_3d(p2 - search_center, mean_normal);

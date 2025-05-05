@@ -39,6 +39,28 @@ stage by inserting edges between different faces and thus merging them. It turns
 most information from the input point cloud. Second, our method provides
 control over the topology of the reconstructed surface._
 
+# BibTeX
+If you're interested in this work, please cite our paper using the BibTeX entry below.
+```
+@article{10.1145/3687956,
+author = {Cui, Ruiqi and G\ae{}de, Emil Toftegaard and Rotenberg, Eva and Kobbelt, Leif and B\ae{}rentzen, J. Andreas},
+title = {Surface Reconstruction Using Rotation Systems},
+year = {2024},
+issue_date = {December 2024},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {43},
+number = {6},
+issn = {0730-0301},
+doi = {10.1145/3687956},
+journal = {ACM Trans. Graph.},
+month = nov,
+articleno = {190},
+numpages = {22},
+keywords = {triangle mesh, surface reconstruction, point cloud, graph}
+}
+```
+
 # Updates and To-do list
 
 <details>
@@ -211,27 +233,43 @@ You can modify the config file to adapt the software to different scenarios. The
 - **n**: threshold for connecting handles. The edge number of the shortest path in graph should be larger than n for a handle to be considered not a spurious one.
 - **isDebug**: by default is false. You can set it to true if you want some intermediate results exported.
 # Results reproduction
+We provide point cloud files that are synthesized by ourselves in the example folder, and reproduce those results by running the following command for each. For results on other public dataset, please download and write similar config file as we do in the examples.
 
+ - **Teaser**:
+ ```
+ // For Windows
+ ./build/Release/RsR.exe ./configs/teaser_config.txt
+
+ // For Linux and Mac
+./build/RSR ./configs/teaser_config.txt
+ ```
+
+  - **Pipeline in Fig.6**:
+ ```
+ // For Windows
+ ./build/Release/RsR.exe ./configs/letter_config.txt
+
+  // For Linux and Mac
+./build/RSR ./configs/letter_config.txt
+ ```
+
+  - **Tree in Fig.12**:
+ ```
+ // For Windows
+ ./build/Release/RsR.exe ./configs/tree_config.txt
+
+  // For Linux and Mac
+./build/RSR ./configs/tree_config.txt
+ ```
+
+  - **Landscape in Fig.12**:
+ ```
+ // For Windows
+ ./build/Release/RsR.exe ./configs/landscape_config.txt
+
+  // For Linux and Mac
+./build/RSR ./configs/landscape_config.txt
+ ```
 # Acknowledgments
 We thank all data providers: the Stanford Computer Graphics Laboratory; Qingnan Zhou and Alec Jacobson; Chu et al.; Armeni et al.; Matterport, Inc.; Knapitsch et al.; and Anderson Winkler. We thank the anonymous reviewers for their helpful comments. This work is partially supported by a DTU alliance scholarship, the Danish Council for Independent Research (6111-00552B), the Carlsberg Foundation (CF21-0302), and the German Research Foundation (Gottfried Wilhelm Leibniz programme).
-# BibTeX
 
-```
-@article{10.1145/3687956,
-author = {Cui, Ruiqi and G\ae{}de, Emil Toftegaard and Rotenberg, Eva and Kobbelt, Leif and B\ae{}rentzen, J. Andreas},
-title = {Surface Reconstruction Using Rotation Systems},
-year = {2024},
-issue_date = {December 2024},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-volume = {43},
-number = {6},
-issn = {0730-0301},
-doi = {10.1145/3687956},
-journal = {ACM Trans. Graph.},
-month = nov,
-articleno = {190},
-numpages = {22},
-keywords = {triangle mesh, surface reconstruction, point cloud, graph}
-}
-```

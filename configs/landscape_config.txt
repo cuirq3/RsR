@@ -1,0 +1,9 @@
+root ./example
+model_name landscape.obj
+out_root ./output
+out_name landscape
+isEuclidean true
+isGTNormal true
+k 150
+genus 0
+isDebug false

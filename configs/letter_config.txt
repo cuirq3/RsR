@@ -1,0 +1,9 @@
+root ./example
+model_name letter_G.obj
+out_root ./output
+out_name letter_G
+isEuclidean true
+isGTNormal true
+k 30
+n 40
+isDebug false

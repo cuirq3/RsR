@@ -1,0 +1,10 @@
+root ./example
+model_name teaser.obj
+out_root ./output
+out_name teaser
+isEuclidean true
+isGTNormal true
+isNoiseExp false
+isDebug false
+k 30
+n 30
