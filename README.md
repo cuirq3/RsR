@@ -245,6 +245,8 @@ We provide point cloud files that are synthesized by ourselves in the example fo
  ```
 
   - **Pipeline in Fig.6**:
+
+  You can change the file name in the config file to reconstruct different letters.
  ```
  // For Windows
  ./build/Release/RsR.exe ./configs/letter_config.txt
