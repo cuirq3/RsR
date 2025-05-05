@@ -254,6 +254,8 @@ We provide point cloud files that are synthesized by ourselves in the example fo
  ```
 
   - **Tree in Fig.12**:
+
+  Due to the large size of the pointcloud, we can't put it in the repo. Please download the [tree](https://drive.google.com/file/d/1JDpMZe5zTz_RJCwGehxiG1B1yT5TbCZK/view?usp=sharing) here and place it at example/tree.obj
  ```
  // For Windows
  ./build/Release/RsR.exe ./configs/tree_config.txt
