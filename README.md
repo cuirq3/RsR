@@ -80,7 +80,7 @@ keywords = {triangle mesh, surface reconstruction, point cloud, graph}
 <br>
 
 # Getting Started
-We tested our project on Windows, Linux, and Mac OS. You can find the corresponding installation guide below.
+We tested our project on Windows, Linux, and Mac OS. You can expand the tags below for instructions specific to each system.
 
 <details>
 
