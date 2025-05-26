@@ -4,7 +4,7 @@
 #include <algorithm>
 #include "boost/filesystem/operations.hpp" // includes boost/filesystem/path.hpp
 #include "boost/filesystem/fstream.hpp"    // ditto                       // for std::cout
-#include <CGAL/IO/OBJ.h>
+//#include <CGAL/IO/OBJ.h>
 #include "graph_utils.h"
 #include "happly.h"
 
