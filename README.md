@@ -63,17 +63,25 @@ keywords = {triangle mesh, surface reconstruction, point cloud, graph}
 
 # Updates and To-do list
 
-<details>
+<details open>
 <summary><span style="font-weight: bold;">Updates</span></summary>
 <ul>
   <li><b>[09/09/2024]</b> Code release.</li>
+  <li><b>[02/05/2025]</b> The code is available in Pygel. For ease of use, you can refer to <a href = https://pypi.org/project/PyGEL3D>PyGEL</a> and <a href = https://github.com/janba/GEL>GEL</a>. Use it by calling hmesh.rsr_recon()</li>
+  <li style="list-style: disc; list-style-position: outside;">
+    <div style="display: flex; align-items: center; height: 100px;">
+      <b>[28/05/2025]</b> Our work has been awarded Replicability stamp 🎉
+      <a href="http://www.replicabilitystamp.org#https-github-com-cuirq3-rsr">
+        <img src="https://www.replicabilitystamp.org/logo/Reproducibility-small.png" style="width: 60px; margin-left: 10px;">
+      </a>
+    </div>
+  </li>
 </ul>
 </details><br>
 
-<details>
+<details open>
 <summary><span style="font-weight: bold;">To-do list</span></summary>
 <ul>
-  <li><b>Integration:</b> Embed our code into Pygel.</li>
   <li><b>Improvement:</b> Remove the reliance on 3rd party libraries.</li>
 </ul>
 </details>
